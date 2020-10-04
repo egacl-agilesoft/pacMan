@@ -1,29 +1,56 @@
 <html>
+<SCRIPT>
+    var pos = 0;
+    const pacArray = [
+        ['PacMan1.png', 'PacMan2.png'],
+        ['PacMan3.png', 'PacMan4.png']
+    ];
+    var direction = 0;
+    var focus = 0;
+    var flag = 1;
+    var img = null;
+    const url = 'http://localhost:3000'; // change this to IP address of server;
 
-<head>
-    <SCRIPT>
-        var flag = 1,
-            pos = 0,
-            img = null,
-            url = 'http://localhost:3000'; // change this to IP address of server
-
-        function Run() {
-            img = document.getElementById("PacMan");
-            pos += 20;
+    function Run() {
+        console.log('RUN!')
+        let img = document.getElementById("PacMan");
+        let imgWidth = img.width
+        focus = (focus + 1) % 2;
+        direction = checkPageBounds(direction, imgWidth);
+        // img.src = pacArray[direction][focus];
+        if (direction) {
+            pos -= 20;
             img.style.left = pos + "px";
+            if (flag === 3) {
+                flag = 4;
+            } else {
+                flag = 3;
+            }
+        } else {
+            pos += 20;
+            img.style.left = pos + 'px';
             if (flag === 1) {
-                img.src = url + '/pac?id=' + flag; // use flag to choose image
                 flag = 2;
             } else {
                 flag = 1;
             }
-            // send position data to Server in url
-            fetch(url + '/set?x=' + pos);
         }
-    </SCRIPT>
-</head>
+        img.src = url + '/pac?id=' + flag; // use flag to choose image
+        // send position data to Server in url
+        fetch(url + '/set?x=' + pos);
+        setTimeout(Run, 200);
+    }
+
+    function checkPageBounds(direction, imgWidth) {
+        let pageWidth = window.innerWidth;
+        if (direction == 0 && pos + imgWidth > pageWidth) direction = 1;
+        if (direction == 1 && pos < 0) direction = 0;
+        return direction;
+    }
+</SCRIPT>
 
 <body>
-    <p>Click on PacMan and the position will be sent to the server".</p>
-    <img id="PacMan" src='http://localhost:3000/pac?id=2' onclick="Run()" style="position:absolute">
+    <img id="PacMan" src="http://localhost:3000/pac?id=2" width='200' onclick="Run()" style="position:absolute"> </img>
 </body>
+
+</html>
